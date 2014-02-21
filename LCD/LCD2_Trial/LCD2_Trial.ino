@@ -22,6 +22,4 @@ void loop()
  slcd.print(" yf ");
  slcd.setCursor(5,4);
  slcd.print("cs");
-
-
 }
