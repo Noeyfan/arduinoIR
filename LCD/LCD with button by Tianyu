@@ -1,0 +1,53 @@
+#include <SoftwareSerial.h>
+
+#include <SerialLCD.h>
+
+int tempPin = 0;
+int buttonPin = 10;
+SerialLCD slcd(11,12);
+
+void setup()
+{
+    slcd.begin();
+    pinMode(buttonPin,INPUT);
+
+
+
+
+}
+
+
+void loop()
+{
+   slcd.backlight();
+   if(digitalRead(buttonPin))
+   {
+      delay(10);
+      slcd.clear();
+   
+   
+   }
+if(digitalRead(buttonPin))
+{
+slcd.clear();
+   float temp = analogRead(tempPin);
+   temp = (float)(1023-temp)*10000/temp;
+   temp = 1/(log(temp/10000)/3975+1/298.15)-273.15;
+   slcd.setCursor(0,0);
+   slcd.print(" temp: ");
+   slcd.print(temp,2);
+   delay(50);
+}
+else
+{
+slcd.clear();
+slcd.setCursor(0,0);
+slcd.print(" LTY ");
+slcd.setCursor(0,1);
+slcd.print(" STC ");
+delay(50);
+
+
+}
+
+}
