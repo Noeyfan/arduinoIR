@@ -11,7 +11,7 @@ The change can be made directly to the LCD file and push again
 
 ### Push code
 
-Now you can run one code to push 
+Now you can run one command to push 
 ```ruby
     $ rake push
 ```
