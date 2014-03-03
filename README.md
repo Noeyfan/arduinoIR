@@ -9,7 +9,6 @@ Which should be done in the LCD folder, I will put some demon and you can try to
 
 The change can be made directly to the LCD file and push again
 
-<a name="packaging_task"></a>
 ### Push code
 
 Now you can run one code to push 
