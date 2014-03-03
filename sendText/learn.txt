@@ -1,0 +1,3 @@
+http://arduinobasics.blogspot.com/2012/05/reading-from-text-file-and-sending-to.html
+
+Arduino + processing Serial port transmit
