@@ -1,53 +1,83 @@
 #include <SoftwareSerial.h>
-
+#include <IRremote.h>
 #include <SerialLCD.h>
 
-int tempPin = 0;
+char inbyte;
+String indata="";
 int buttonPin = 9;
+int downloadPin = 6;
+int RECV_PIN = 11;
+unsigned int data[300]={0};
+int count =0;
 SerialLCD slcd(11,12);
-const char* m[6][6] = {{"TV", "Vup", "CHup", "Back"},
-                       {"DVD", "Dup", "DHup", "Back" },
+IRsend irsend;
+
+
+const char* m[15][15] = {{"TV", "Vup", "CHup", "Back"},
+                       {"DVD", "Dup", "DHup", "Vup","Vdown","Xup","Yup","Zup","Wup","Back" },
                        {"Ref", "Ropen", "Rclose", "Back"},
                        {"MicW", "Mopen", "Mclose", "Back"},
-                  };
-//m[0][0]="TV";
-//m[1][0]="DVD";
-//m[2][0]="Air";
-//m[3][0]="Fre";
-//m[4][0]="MicW";
-int i =0;
-int j =1;
+                  };                 
+
+                 
 void setup() {
+  Serial.begin(9600);
     slcd.begin();
     pinMode(buttonPin,INPUT);
     slcd.backlight();
-    slcd.setCursor(0,0);
-    slcd.print(m[i][0]);
-    delay(100);
 }
 
 void loop() {
-  while(i <= 4) {
-    slcd.setCursor(0,0);
-    slcd.print (m[i][0]);
+  readin();
+  int i =0;
+  int j =1;
+  while(m[i-1][j-1] != '\0') {
+      slcd.setCursor(0,0);
+      slcd.print (m[i++][0]);
+       delay(1000);
     if(digitalRead(buttonPin)) {
-     while(j < 4) {
+     Serial.print(i);
+     while(m[i-1][j] != '\0') {
      slcd.clear();
      slcd.setCursor(0,0);
-     slcd.print(m[i-1][0]); 
-     slcd.setCursor(0,1);
-     slcd.print(m[i-1][j++]);
-     delay(1000);
+     //have to set display when press on the last menu
+
+       slcd.print(m[i-1][0]); 
+       slcd.setCursor(0,1);
+       slcd.print(m[i-1][j++]);
+       delay(1000);
+       //TODO add send signal
+       if (digitalRead(buttonPin) && m[i-1][j] != '\0') {
+         slcd.clear();
+         slcd.setCursor(0,1);
+         slcd.print("sent");
+         sendSignal(data,count);
+         delay(500);
+         j=j-1;
+       }
+       //TODO Manually DOWNLOAD the code
+       else if (digitalRead(downloadPin)) {
+         readin();
+       }
      }
        j=1;
        slcd.clear();
     }
-        i++;
-        delay(1000);
   }
-  i = 0;
-  slcd.clear();
-  slcd.setCursor(0,0);
-  slcd.print(m[0][0]);
-  slcd.setCursor(0,1);
+    slcd.clear();
+}
+
+void sendSignal(unsigned int sig[], int num) {
+  //TODO add send signal
+  irsend.sendRaw(sig, num, 38);
+}
+
+void readin() {
+  if (Serial.available()) {
+    inbyte = Serial.read();
+    indata.concat(inbyte);
+  }
+  if (indata != "") {
+    Serial.println(indata);
+  }
 }
