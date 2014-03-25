@@ -1,6 +1,7 @@
 #include <SoftwareSerial.h>
 #include <IRremote.h>
 #include <SerialLCD.h>
+#include <string>
 
 char inbyte;
 String indata="";
@@ -17,7 +18,8 @@ const char* m[15][15] = {{"TV", "Vup", "CHup", "Back"},
                        {"DVD", "Dup", "DHup", "Vup","Vdown","Xup","Yup","Zup","Wup","Back" },
                        {"Ref", "Ropen", "Rclose", "Back"},
                        {"MicW", "Mopen", "Mclose", "Back"},
-                  };                 
+                  };
+
 
                  
 void setup() {
