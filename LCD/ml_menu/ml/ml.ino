@@ -59,6 +59,7 @@ void loop()
 			int idx = signal_entry[sub_cursor];
 			while (idx < signal_entry[sub_cursor+1]) {
 				// send signal[idx];
+				slcd.print();
 				idx++;
 			}
 		}

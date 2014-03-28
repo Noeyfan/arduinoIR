@@ -14,22 +14,19 @@ void setup() {
 }
 
 void loop() {
-  
+
 	readstring() ;
 	if (digitalRead(downloadPIN)) {
-        Serial.print("0");
-        k = 0;
- } 
+		Serial.print("0");
+		k = 0;
+	} 
 }
 
 void readstring() {
 	while(Serial.available() > 0) {
 		character = Serial.read();
-                Serial.print(character);
-                a[k++] = character;
+		//Serial.print(character);
+		a[k++] = character;
 		//content.concat(character);
 	} 
-	
 }
-
-
