@@ -1,11 +1,12 @@
-int incomingByte;	// for incoming serial data
 int downloadPIN = 9;
 //int uploadPIN = 4;
-char a[100];
-String content="";
+char a[]={};
 char character;
-boolean ft=true;
-int downsig=9;
+boolean ft = true;
+int downsig=0;
+char str[4] = {'\0'};
+int k =0;
+
 //create hash to map menu name and IRcode
 
 void setup() {
@@ -13,40 +14,22 @@ void setup() {
 }
 
 void loop() {
+  
+	readstring() ;
 	if (digitalRead(downloadPIN)) {
-          //Serial.println("b pressed");
-          /*if (ft){
-           Serial.print(downsig);
-           //Serial.flush();
-           //Serial.println("write 1");
-           ft=false;
-          }*/
-  	  readstring();
-	}
-
-     /* if (digitalRead(uploadPIN)) {
-        if (ft){
-           Serial.write(2);
-           //Serial.println("write 1");
-           ft=false;
-      }
-      sendint();
-}*/
+        Serial.print("0");
+        k = 0;
+ } 
 }
 
 void readstring() {
- while(Serial.available() > 0) {
-  character = Serial.read();
-  Serial.flush();
-  content.concat(character);
- } 
- if(content !="") {
-  Serial.print(content); 
-  content="";
- }
+	while(Serial.available() > 0) {
+		character = Serial.read();
+                Serial.print(character);
+                a[k++] = character;
+		//content.concat(character);
+	} 
+	
 }
 
-void sendint() {
-        /*things to be dumped*/
-	//Serial.write(1);
-}
+

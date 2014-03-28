@@ -11,16 +11,15 @@ int RECV_PIN = 11;
 SerialLCD slcd(11,12);
 IRsend irsend;
 int i = 0;
-int j =0;
 int sub_count = 0;
 int sub_start = 0;
 
 
-const char* menu[]={"TV", "DVD", "AIR"};
-const char* sub_menu[]={"UP", "DOWN", "VUP", "UP", "DOWN", "OPEN", "CLOSE"};
-int entry[] = {0, 3, 5};
-int menu_count[]={3, 2, 2};
-int signal[]={1, 2, 3, 4, 5, 6, 7};
+const char* menu[] = {"TV", "DVD", "AIR"};
+const char* sub_menu[] = {"UP", "DOWN", "VUP", "UP", "DOWN", "OPEN", "CLOSE"};
+int entry[] = {0, 3, 5, 7};
+int signal[] = {1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 7};
+int signal_entry[] = {0, 2, 5, 7, 9, 10, 10, 11};
 
 void setup() {
 	Serial.begin(9600);
@@ -30,14 +29,14 @@ void setup() {
 }
 
 //add number before
-int add(int n)
-{
-	int sum=0;
-	for (int i=0; i<n; i++) {
-		sum	= sum + menu_count[i];
-	}
-	return sum;
-}
+//int add(int n)
+//{
+//	int sum=0;
+//	for (int i=0; i<n; i++) {
+//		sum	= sum + menu_count[i];
+//	}
+//	return sum;
+//}
 
 int status = 0; // 0 for main menu; 1 for sub menu; 
 int main_cursor = 0;
@@ -49,15 +48,19 @@ void loop()
 	slcd.print(menu[main_cursor]);
 	if (status == 1) {
 		slcd.setCursor(0,1);
-		slcd.print(sub_menu[entry[main_cursor] + sub_cursor]);
+		slcd.print(sub_menu[sub_cursor]);
 	}
 	delay(1000);
 	if (digitalRead(buttonPin)) {
 		if (status == 0) {
 			status = 1;
-			sub_cursor = 0;
+			sub_cursor = entry[main_cursor];
 		} else {
-			// send signal[entry[main_cursor] + sub_cursor]
+			int idx = signal_entry[sub_cursor];
+			while (idx < signal_entry[sub_cursor+1]) {
+				// send signal[idx];
+				idx++;
+			}
 		}
 	} else {
 		if (status == 0) {
@@ -65,7 +68,7 @@ void loop()
 				main_cursor = 0;
 			}
 		} else {
-			if (++sub_cursor >= menu_count[main_cursor]) {
+			if (++sub_cursor >= entry[main_cursor+1]) {
 				status = 0;
 			}
 		}
