@@ -3,7 +3,7 @@
 desc "commit"
 task :push do 
 	puts "\n ## staging modified files"
-	status = system ("git add .")
+	status = system ("git add -A .")
 	puts status ? "Success" : "Failed"
 	puts "\n ## commit at #{Time.now}"
 	message = "Build at #{Time.now}"
