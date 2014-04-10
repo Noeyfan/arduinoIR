@@ -6,7 +6,7 @@
 char inbyte;
 String indata="";
 int buttonPin = 9;
-int downloadPin = 6;
+int uploadPin = 6;
 int RECV_PIN = 11;
 SerialLCD slcd(11,12);
 IRsend irsend;
@@ -20,6 +20,12 @@ const char* sub_menu[] = {"UP", "DOWN", "VUP", "UP", "DOWN", "OPEN", "CLOSE"};
 int entry[] = {0, 3, 5, 7};
 int signal[] = {1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 7};
 int signal_entry[] = {0, 2, 5, 7, 9, 10, 10, 11};
+
+int buttonState = 0;         // variable for reading the pushbutton status
+//void printsig(const char* a[], int len);
+//void printsig_int(int a[], int len);
+#define printsig(arr) printsig_impl(arr, sizeof(arr)/sizeof(*arr))
+#define printsig_int(arr) printsig_int_impl(arr, sizeof(arr)/sizeof(*arr))
 
 void setup() {
 	Serial.begin(9600);
@@ -44,6 +50,42 @@ int sub_cursor = 0;
 
 void loop()
 {
+	// upload
+	buttonState = digitalRead(uploadPin); //record the button state
+	if (buttonState == HIGH) {
+		slcd.clear();
+		slcd.setCursor(0,0);
+		slcd.print("Uploading");
+		slcd.setCursor(0,1);
+		slcd.print("..");
+		printsig(menu);
+		delay(1000);
+		slcd.setCursor(0,1);
+		slcd.print("....");
+		printsig(sub_menu);
+		delay(1000);
+		slcd.setCursor(0,1);
+		slcd.print("........");
+		printsig_int(entry);
+		delay(1000);
+		slcd.setCursor(0,1);
+		slcd.print("...........");
+		printsig_int(signal);
+		delay(1000);
+		slcd.setCursor(0,1);
+		slcd.print(".............");
+		printsig_int(signal_entry);
+		delay(1000);
+		slcd.setCursor(0,1);
+		slcd.print("...............");
+		slcd.clear();
+		slcd.setCursor(0,1);
+		slcd.print("Success");
+		delay(1000);
+		slcd.clear();
+	}
+
+	//show menu
 	slcd.setCursor(0,0);
 	slcd.print(menu[main_cursor]);
 	if (status == 1) {
@@ -59,7 +101,7 @@ void loop()
 			int idx = signal_entry[sub_cursor];
 			while (idx < signal_entry[sub_cursor+1]) {
 				// send signal[idx];
-				slcd.print();
+				slcd.print("sent");
 				idx++;
 			}
 		}
@@ -75,31 +117,20 @@ void loop()
 		}
 	}
 	slcd.clear();
-	//while (menu[i] != NULL) {
-	//	slcd.setCursor(0,0);
-	//	slcd.print(menu[i++]);
-	//	delay(1000);
-	//	if (digitalRead(buttonPin)) {
-	//		sub_count = menu_count[i];
-	//		sub_start = add(i);
-	//		Serial.println(sub_count);
-	//		Serial.println(sub_start);
-	//		while(j < sub_count) {
-	//			slcd.setCursor(0,1);
-	//			slcd.print(sub_menu[sub_start]);
-	//			delay(1000);
-	//			if (digitalRead(buttonPin)) {
-	//				//send signal[sub_start];
-	//			}
-	//			sub_start++;
-	//			j++;
-	//		}
-	//		j=0;
-	//		slcd.clear();
-	//	} else {
-	//		i++;
-	//	}
-	//}
-	//i=0;
-	//slcd.clear();
+}
+
+void printsig_impl(const char* a[], int len) {
+	for (int i = 0; i < len; i++) {
+		Serial.print(a[i]);
+		Serial.print(", ");
+	}
+	Serial.println("");
+}
+
+void printsig_int_impl(int a[], int len) {
+	for (int i = 0; i < len; i++) {
+		Serial.print(a[i]);
+		Serial.print(", ");
+	}
+	Serial.println("");
 }

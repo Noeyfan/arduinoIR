@@ -13,15 +13,12 @@ int count =0;
 SerialLCD slcd(11,12);
 IRsend irsend;
 
-
 const char* m[15][15] = {{"TV", "Vup", "CHup", "Back"},
                        {"DVD", "Dup", "DHup", "Vup","Vdown","Xup","Yup","Zup","Wup","Back" },
                        {"Ref", "Ropen", "Rclose", "Back"},
                        {"MicW", "Mopen", "Mclose", "Back"},
                   };
 
-
-                 
 void setup() {
   Serial.begin(9600);
     slcd.begin();

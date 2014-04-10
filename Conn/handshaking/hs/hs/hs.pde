@@ -1,47 +1,48 @@
 import processing.serial.*;
-Serial myPort;
-String val;
 
-boolean firstContact = false;
+Serial myPort;  // The serial port
+PrintWriter fout;
+int i = 0;
 
-void setup()
-{
-	size(200,200);
+void setup() {
+	size(500,200);
+	background(255);
+	// List all the available serial ports:
+	println(Serial.list());
+	// Open the port you are using at the rate you want:
 	myPort = new Serial(this, Serial.list()[0],9600);
-	myPort.bufferUntil('\n');
-	myPort.write('C');
+
+	//create file writer
+	fout = createWriter("conf.txt");
+
+	//set guide
+	PFont f;
+	f = createFont("Arial",16,true);
+	textFont(f,16);
+	fill(0,0,255);
+	text("Please plugin the IRremote and press the upload button to upload ",10,80);
+	text("Settings would be saved to conf.txt ",10,110);
 }
 
-void draw()
-{
+void draw() {
+	while (myPort.available() > 0) {
+		String inBuffer = myPort.readString();
+		if (inBuffer != null) {
+			fout.print(inBuffer);
+			fout.flush();
+			print(inBuffer);
+			if (i <= 450) {
+				rect(10,130,i,20);
+				i += 38;
+			}else {
+				rect(10,130,450,20);
+			}
+			stroke(0,0,255);
+			fill(0,0,255);
+		}
+	}
 }
 
-
-void serialEvent(Serial myPort)
-{
-	val = myPort.readStringUntil('\n');
-	if (val != null) {
-		val = trim(val);
-		println(val, count++);
-	}
-	if (count == 15) {
-		myPort.write('C');
-	}
-
-	//if (!firstContact) {
-	//	if (val.equals("A")) {
-	//		myPort.clear();
-	//		firstContact = true;
-	//		myPort.write("A");
-	//		println("A");
-	//		println("contact");
-	//	}else {
-	//		println(val);
-	//		if (mousePressed) {
-	//			myPort.write('1');
-	//			println("1");
-	//		}
-	//		myPort.write("A");
-	//	}
-	//}
+void mousePressed() {
+	i = 0;
 }

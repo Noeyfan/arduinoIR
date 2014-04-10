@@ -15,3 +15,19 @@ Now you can run one command to push
 ```ruby
     $ rake push
 ```
+
+Progress for now
+=========
+The remote can show menu, send signal as well as upload to "conf.txt"
+
+Processing code are located in
+
+```
+ArduinoIR/Conn/handshaking/hs/hs
+```
+
+Arduino code are located in
+
+```
+ArduinoIR/LCD/ml_menu/ml
+```
