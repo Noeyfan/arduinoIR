@@ -1,7 +1,7 @@
 import processing.serial.*;
 
 Serial myPort;  // The serial port
-PrintWriter fout;
+OutputStream fout;
 int i = 0;
 
 void setup() {
@@ -13,7 +13,8 @@ void setup() {
 	myPort = new Serial(this, Serial.list()[0],9600);
 
 	//create file writer
-	fout = createWriter("conf.txt");
+	//fout = createWriter("conf.txt");
+	fout = createOutput("conf.txt");
 
 	//set guide
 	PFont f;
@@ -26,10 +27,14 @@ void setup() {
 
 void draw() {
 	while (myPort.available() > 0) {
-		String inBuffer = myPort.readString();
+		print("!!!\n");
+		byte[] inBuffer = myPort.readBytes();
 		if (inBuffer != null) {
-			fout.print(inBuffer);
+			try {
+			fout.write(inBuffer);
 			fout.flush();
+			} catch(Exception e) {
+			}
 			print(inBuffer);
 			if (i <= 450) {
 				rect(10,130,i,20);
