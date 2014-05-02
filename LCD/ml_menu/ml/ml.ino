@@ -56,12 +56,12 @@ int buttonState = 0;         // variable for reading the pushbutton status
 //if ((((uint8_t*)arr)[i] = file.read()) == -1) {
 
 void setup() {
-	pinMode(buttonPin,INPUT);
 	Serial.begin(9600);
 	slcd.begin();
-	irrecv.enableIRIn();
-	pinMode(10, OUTPUT);
+	//irrecv.enableIRIn();
+	pinMode(buttonPin,INPUT);
 	slcd.backlight();
+	pinMode(10, OUTPUT);
 	//slcd.print("Hello, world");
 	//delay(1000);
 	if (!SD.begin(4)) {
