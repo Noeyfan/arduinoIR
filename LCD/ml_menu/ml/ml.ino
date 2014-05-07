@@ -7,8 +7,8 @@ File myFile;
 char inbyte;
 String indata="";
 int buttonPin = 9;
-int uploadPin = A1;
-int learnPin = 6;
+int uploadPin = 13;
+int learnPin = 5;
 SerialLCD slcd(7,8);
 IRsend irsend;
 IRrecv irrecv(A4);
@@ -18,12 +18,13 @@ int i = 0;
 int sub_count = 0;
 int sub_start = 0;
 
+//signal is acutually a cache
 struct Signal {
-int code[68];
+	unsigned int code[69];
 };
 
 char menu[5][10] = {"TV", "DVD", "AIR", ""};
-char sub_menu[20][10] = {"UP", "DOWN", "VUP", "UP", "DOWN", "OPEN", "CLOSE"};
+char sub_menu[10][10] = {"UP", "DOWN", "VUP", "UP", "DOWN", "OPEN", "CLOSE"};
 int entry[] = {0, 3, 5, 7};
 Signal signal[1];
 
@@ -38,27 +39,20 @@ Signal signal[1];
 
 int buttonState = 0;         // variable for reading the pushbutton status
 
-//void printsig(const uint8_t* a[], int len);
-//void printsig_int(int a[], int len);
-//#define printsig(arr) printsig_impl(arr, sizeof(arr)/sizeof(*arr))
-//#define printsig_int(arr) printsig_int_impl(arr, sizeof(arr)/sizeof(*arr))
-
-#define read_to_array(file, arr) \
-{\
-	int i;\
-	for (i = 0; i < sizeof(arr); i++) {\
-		if ((((uint8_t*)arr)[i] = file.read()) == -1) {\
-			Serial.println("a byte is expected but failed");\
-		}\
-	}\
+void read_to_array(File file, uint8_t* arr, int n) {
+	int i;
+	for (i = 0; i < n; i++) {
+		if ((arr[i] = file.read()) == -1) {
+			Serial.println("a byte is expected but failed");
+			break;
+		}
+	}
 }
-
-//if ((((uint8_t*)arr)[i] = file.read()) == -1) {
 
 void setup() {
 	Serial.begin(9600);
 	slcd.begin();
-	//irrecv.enableIRIn();
+	irrecv.enableIRIn();
 	pinMode(buttonPin,INPUT);
 	slcd.backlight();
 	pinMode(10, OUTPUT);
@@ -75,14 +69,9 @@ void setup() {
 		//read_to_array(myFile, menu);
 		//read_to_array(myFile, sub_menu);
 		//read_to_array(myFile, entry);
-		//read_to_array(myFile, signal);
-		//read_to_array(myFile, signal_entry);
 		//Serial.println("read finished");
 		myFile.close();
-		//for (int k = 0; k < sizeof(menu); k++) {
-		//	Serial.println(menu[k]);
-		//	//why print out sub_menu
-		//}
+		//Serial.println("succ opening conf.txt");
 	} else {
 		// if the file didn't open, print an error:
 		Serial.println("error opening conf.txt");
@@ -96,7 +85,6 @@ int sub_cursor = 0;
 
 void loop()
 {
-	// upload
 	buttonState = digitalRead(uploadPin); //record the button state
 	if (buttonState == HIGH) {
 		slcd.clear();
@@ -116,7 +104,7 @@ void loop()
 		delay(1000);
 		slcd.setCursor(0,1);
 		slcd.print("...........");
-		Serial.write((uint8_t*)signal, sizeof(signal));
+		Serial.write((uint8_t*)signal, sizeof(signal[0].code));
 		delay(1000);
 		slcd.setCursor(0,1);
 		slcd.print(".............");
@@ -138,33 +126,50 @@ void loop()
 		slcd.setCursor(0,1);
 		slcd.print(sub_menu[sub_cursor]);
 	}
-	delay(1000);
 	if (digitalRead(buttonPin)) {
 		if (status == 0) {
 			status = 1;
 			sub_cursor = entry[main_cursor];
-		} else {
+		}
+		else {
 			//send signal[sub_cursor]
 			//loadsignal
-			slcd.print("sent");
+			myFile = SD.open("sig.txt", FILE_READ);
+			if(myFile) {
+				myFile.seek(sub_cursor*sizeof(signal[0].code));
+				read_to_array(myFile, (uint8_t*)signal[0].code, sizeof(signal[0].code));
+			}
+			myFile.close();
+			int count = signal[0].code[0];
+			irsend.sendRaw(signal[0].code+1, count, 38);
 		}
-	} else if (digitalRead(learnPin)) {
+	} 
+	else if (digitalRead(learnPin)) {
 		if (status == 0) {
 			// do nothing
 		} else {
 			// Listen for IR signal and write to file[sub_cursor]
+			Serial.println("!!");
 			if (irrecv.decode(&results)) {
-			  dump(&results);
-			  delay(500);
-				myFile = SD.open("signal.data",FILE_WRITE);
+				Serial.println("!!!");
+				dump(&results);
+				myFile = SD.open("sig.txt", FILE_WRITE);
 				if(myFile) {
-					myFile.seek(sub_cursor*sizeof(signal));
-					myFile.write((uint8_t*)signal, sizeof(signal));
+					//Serial.println("");
+					myFile.seek(sub_cursor*sizeof(signal[0].code));
+					myFile.write((uint8_t*)signal, sizeof(signal[0].code));
+					Serial.println(signal[0].code[0]);
+					for (int i = 1; i <= signal[0].code[0]; i++) {
+						Serial.print(signal[0].code[i], DEC);
+						Serial.print(" ");
+					}
+					Serial.println("");
+				} else {
+					Serial.println("error");
 				}
 				myFile.close();
-			  irrecv.resume(); // Receive the next value
+				irrecv.resume(); // Receive the next value
 			}
-
 		}
 	} else {
 		if (status == 0) {
@@ -177,47 +182,18 @@ void loop()
 			}
 		}
 	}
+	delay(1000);
 	slcd.clear();
 }
 
 void dump(decode_results *results) {
 	int count = results->rawlen;
 	if (results->decode_type == UNKNOWN) {
-		Serial.print("Unknown encoding: ");
+		Serial.println("Unknown encoding: ");
 	}
-	//else if (results->decode_type == NEC) {
-	//  Serial.print("Decoded NEC: ");
-	//}
-	//else if (results->decode_type == SONY) {
-	//  Serial.print("Decoded SONY: ");
-	//}
-	//else if (results->decode_type == RC5) {
-	//  Serial.print("Decoded RC5: ");
-	//}
-	//else if (results->decode_type == RC6) {
-	//  Serial.print("Decoded RC6: ");
-	//}
-	//else if (results->decode_type == PANASONIC) {
-	//  //  Serial.print("Decoded PANASONIC");
-	//  Serial.print("Decoded PANASONIC - Address: ");
-	//  Serial.print(results->panasonicAddress,HEX);
-	//  Serial.print(" Value: ");
-	//}
-	//else if (results->decode_type == JVC) {
-	//  Serial.print("Decoded JVC: ");
-	//}
-	Serial.print(results->value, HEX);
-	Serial.print(" (");
-	Serial.print(results->bits, DEC);
-	Serial.println(" bits)");
-	Serial.print("Raw (");
-	Serial.print(count, DEC);
-	Serial.print("): ");
-
-	for (int i = 0; i < count; i++) {
-		Serial.print(results->rawbuf[i]*USECPERTICK, DEC);
-		signal[0].code[i] = (results->rawbuf[i+1]*USECPERTICK, DEC);
-		Serial.print(" ");
+	signal[0].code[0] = count;
+	for (int i = 1; i < count; i++) {
+		signal[0].code[i] = results->rawbuf[i]*USECPERTICK;
 	}
-	Serial.println("");
+	signal[0].code[count] = results->rawbuf[0]*USECPERTICK;
 }

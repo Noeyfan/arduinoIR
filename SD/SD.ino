@@ -21,7 +21,5 @@ void setup()
 
 void loop()
 {
-	slcd.print("Hello World");
-	delay(1000);
 }
 
