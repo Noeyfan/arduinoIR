@@ -13,8 +13,8 @@ void setup() {
 	myPort = new Serial(this, Serial.list()[0],9600);
 
 	//create file writer
-	//fout = createWriter("conf.txt");
 	fout = createOutput("conf.txt");
+	//fout = createOutput("sig.txt");
 
 	//set guide
 	PFont f;
@@ -27,7 +27,6 @@ void setup() {
 
 void draw() {
 	while (myPort.available() > 0) {
-		print("!!!\n");
 		byte[] inBuffer = myPort.readBytes();
 		if (inBuffer != null) {
 			try {
@@ -38,7 +37,7 @@ void draw() {
 			print(inBuffer);
 			if (i <= 450) {
 				rect(10,130,i,20);
-				i += 38;
+				i += 55;
 			}else {
 				rect(10,130,450,20);
 			}

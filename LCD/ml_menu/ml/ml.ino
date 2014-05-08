@@ -32,7 +32,7 @@ Signal signal[1];
 //int signal_entry[] = {0, 2, 5, 7, 9, 10, 10, 11};
 
 //char menu[5][10];
-//char sub_menu[20][10];
+//char sub_menu[10][10];
 //int entry[4];
 //int signal[11];
 //int signal_entry[8];
@@ -63,15 +63,12 @@ void setup() {
 		return;
 	}
 	//open menu file
-	//myFile = SD.open("conf.txt",FILE_READ);
 	myFile = SD.open("conf.txt");
 	if (myFile) {
 		//read_to_array(myFile, menu);
 		//read_to_array(myFile, sub_menu);
 		//read_to_array(myFile, entry);
-		//Serial.println("read finished");
 		myFile.close();
-		//Serial.println("succ opening conf.txt");
 	} else {
 		// if the file didn't open, print an error:
 		Serial.println("error opening conf.txt");
@@ -92,19 +89,19 @@ void loop()
 		slcd.print("Uploading");
 		slcd.setCursor(0,1);
 		slcd.print("..");
-		//Serial.write((uint8_t*)menu,sizeof(menu));
+		Serial.write((uint8_t*)menu,sizeof(menu));
 		delay(1000);
 		slcd.setCursor(0,1);
 		slcd.print("....");
-		//Serial.write((uint8_t*)sub_menu, sizeof(sub_menu));
+		Serial.write((uint8_t*)sub_menu, sizeof(sub_menu));
 		delay(1000);
 		slcd.setCursor(0,1);
 		slcd.print("........");
-		//Serial.write((uint8_t*)entry, sizeof(entry));
+		Serial.write((uint8_t*)entry, sizeof(entry));
 		delay(1000);
 		slcd.setCursor(0,1);
 		slcd.print("...........");
-		Serial.write((uint8_t*)signal, sizeof(signal[0].code));
+		//Serial.write((uint8_t*)signal, sizeof(signal[0].code));
 		delay(1000);
 		slcd.setCursor(0,1);
 		slcd.print(".............");
