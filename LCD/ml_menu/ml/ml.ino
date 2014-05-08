@@ -23,17 +23,17 @@ struct Signal {
 	unsigned int code[69];
 };
 
-char menu[5][10] = {"TV", "DVD", "AIR", ""};
-char sub_menu[10][10] = {"UP", "DOWN", "VUP", "UP", "DOWN", "OPEN", "CLOSE"};
-int entry[] = {0, 3, 5, 7};
+//char menu[5][10] = {"TV", "DVD", "AIR", ""};
+//char sub_menu[10][10] = {"UP", "DOWN", "VUP", "UP", "DOWN", "OPEN", "CLOSE"};
+//int entry[] = {0, 3, 5, 7};
 Signal signal[1];
 
 //int signal[] = {1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 7};
 //int signal_entry[] = {0, 2, 5, 7, 9, 10, 10, 11};
 
-//char menu[5][10];
-//char sub_menu[10][10];
-//int entry[4];
+char menu[5][10];
+char sub_menu[10][10];
+int entry[4];
 //int signal[11];
 //int signal_entry[8];
 
@@ -48,6 +48,7 @@ void read_to_array(File file, uint8_t* arr, int n) {
 		}
 	}
 }
+
 
 void setup() {
 	Serial.begin(9600);
@@ -65,9 +66,9 @@ void setup() {
 	//open menu file
 	myFile = SD.open("conf.txt");
 	if (myFile) {
-		//read_to_array(myFile, menu);
-		//read_to_array(myFile, sub_menu);
-		//read_to_array(myFile, entry);
+		read_to_array(myFile, (uint8_t*)menu, sizeof(menu));
+		read_to_array(myFile, (uint8_t*)sub_menu, sizeof(sub_menu));
+		read_to_array(myFile, (uint8_t*)entry, sizeof(entry));
 		myFile.close();
 	} else {
 		// if the file didn't open, print an error:
@@ -89,23 +90,19 @@ void loop()
 		slcd.print("Uploading");
 		slcd.setCursor(0,1);
 		slcd.print("..");
-		Serial.write((uint8_t*)menu,sizeof(menu));
+		//Serial.write((uint8_t*)menu,sizeof(menu));
 		delay(1000);
 		slcd.setCursor(0,1);
 		slcd.print("....");
-		Serial.write((uint8_t*)sub_menu, sizeof(sub_menu));
+		//Serial.write((uint8_t*)sub_menu, sizeof(sub_menu));
 		delay(1000);
 		slcd.setCursor(0,1);
 		slcd.print("........");
-		Serial.write((uint8_t*)entry, sizeof(entry));
+		//Serial.write((uint8_t*)entry, sizeof(entry));
 		delay(1000);
 		slcd.setCursor(0,1);
 		slcd.print("...........");
-		//Serial.write((uint8_t*)signal, sizeof(signal[0].code));
-		delay(1000);
-		slcd.setCursor(0,1);
-		slcd.print(".............");
-		//Serial.write((uint8_t*)signal_entry, sizeof(signal_entry));
+		Serial.write((uint8_t*)signal, sizeof(signal[0].code));
 		delay(1000);
 		slcd.setCursor(0,1);
 		slcd.print("...............");
@@ -123,6 +120,7 @@ void loop()
 		slcd.setCursor(0,1);
 		slcd.print(sub_menu[sub_cursor]);
 	}
+	delay(1000);
 	if (digitalRead(buttonPin)) {
 		if (status == 0) {
 			status = 1;
@@ -146,10 +144,10 @@ void loop()
 			// do nothing
 		} else {
 			// Listen for IR signal and write to file[sub_cursor]
-			Serial.println("!!");
 			if (irrecv.decode(&results)) {
 				Serial.println("!!!");
 				dump(&results);
+				delay(50);
 				myFile = SD.open("sig.txt", FILE_WRITE);
 				if(myFile) {
 					//Serial.println("");
@@ -179,7 +177,6 @@ void loop()
 			}
 		}
 	}
-	delay(1000);
 	slcd.clear();
 }
 
