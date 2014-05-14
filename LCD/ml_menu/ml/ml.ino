@@ -57,8 +57,6 @@ void setup() {
 	pinMode(buttonPin,INPUT);
 	slcd.backlight();
 	pinMode(10, OUTPUT);
-	//slcd.print("Hello, world");
-	//delay(1000);
 	if (!SD.begin(4)) {
 		Serial.println("initialization failed!");
 		return;
@@ -97,18 +95,18 @@ void loop()
 		//Serial.write((uint8_t*)sub_menu, sizeof(sub_menu));
 		delay(1000);
 		slcd.setCursor(0,1);
-		slcd.print("........");
+		//slcd.print("........");
 		//Serial.write((uint8_t*)entry, sizeof(entry));
 		delay(1000);
 		slcd.setCursor(0,1);
-		slcd.print("...........");
+		//slcd.print("...........");
 		Serial.write((uint8_t*)signal, sizeof(signal[0].code));
 		delay(1000);
 		slcd.setCursor(0,1);
 		slcd.print("...............");
 		slcd.clear();
 		slcd.setCursor(0,1);
-		slcd.print("Success");
+		//slcd.print("Success");
 		delay(1000);
 		slcd.clear();
 	}
@@ -145,12 +143,10 @@ void loop()
 		} else {
 			// Listen for IR signal and write to file[sub_cursor]
 			if (irrecv.decode(&results)) {
-				Serial.println("!!!");
 				dump(&results);
 				delay(50);
 				myFile = SD.open("sig.txt", FILE_WRITE);
 				if(myFile) {
-					//Serial.println("");
 					myFile.seek(sub_cursor*sizeof(signal[0].code));
 					myFile.write((uint8_t*)signal, sizeof(signal[0].code));
 					Serial.println(signal[0].code[0]);
